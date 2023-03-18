@@ -30,9 +30,14 @@ namespace FC.Codeflix.Catalog.Domain.Entity
         {
             if (string.IsNullOrWhiteSpace(Name))
                 throw new EntityValidationException($"{nameof(Name)} should not be empty or null");
-
+            if (Name.Length < 3)
+                throw new EntityValidationException($"{nameof(Name)} should not be at least 3 characters");
+            if (Name.Length > 255)
+                throw new EntityValidationException($"{nameof(Name)} should not be less or equal 255 characters");
             if (Description is null)
                 throw new EntityValidationException($"{nameof(Description)} should not be empty or null");
+            if (Description.Length > 10000)
+                throw new EntityValidationException($"{nameof(Description)} should not be less or equal 10000 characters");
         }
     }
 }

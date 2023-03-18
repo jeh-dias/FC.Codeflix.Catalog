@@ -34,11 +34,11 @@ namespace FC.Codefix.Catalog.UnitTests.Domain.Entity.Category
             Assert.True(category.IsActive);
         }
 
-        [Theory(DisplayName = nameof(InstanciateWithIsActive))]
+        [Theory(DisplayName = nameof(Instanciate_With_Is_Active))]
         [Trait("Domain", "Category - Agregates")]
         [InlineData(true)]
         [InlineData(false)]
-        public void InstanciateWithIsActive(bool isActive)
+        public void Instanciate_With_Is_Active(bool isActive)
         {
             var validData = new
             {
@@ -62,12 +62,12 @@ namespace FC.Codefix.Catalog.UnitTests.Domain.Entity.Category
             Assert.Equal(isActive, category.IsActive);
         }
 
-        [Theory(DisplayName = nameof(InstantiateErrorWhenNameIsEmpty))]
+        [Theory(DisplayName = nameof(Instantiate_Error_When_Name_IsEmpty))]
         [Trait("Domain", "Category - Agregates")]
         [InlineData("")]
         [InlineData(null)]
         [InlineData("      ")]
-        public void InstantiateErrorWhenNameIsEmpty(string? name)
+        public void Instantiate_Error_When_Name_IsEmpty(string? name)
         {
             Action action =
                 () => new DomainEntity.Category("Category Description", name!);
@@ -76,9 +76,9 @@ namespace FC.Codefix.Catalog.UnitTests.Domain.Entity.Category
             Assert.Equal($"Name should not be empty or null", exception.Message);
         }
 
-        [Fact(DisplayName = nameof(InstantiateErrorWhenDescriptionIsNull))]
+        [Fact(DisplayName = nameof(Instantiate_Error_When_Description_IsNull))]
         [Trait("Domain", "Category - Agregates")]
-        public void InstantiateErrorWhenDescriptionIsNull()
+        public void Instantiate_Error_When_Description_IsNull()
         {
             Action action =
                 () => new DomainEntity.Category(null!, "Name");
@@ -88,7 +88,46 @@ namespace FC.Codefix.Catalog.UnitTests.Domain.Entity.Category
         }
 
         // name must to have minimum 3 characters
+        [Theory(DisplayName = nameof(Instantiate_Error_When_Name_IsLess_Than_3Characters))]
+        [Trait("Domain", "Category - Agregates")]
+        [InlineData("1")]
+        [InlineData("2")]
+        [InlineData("ac")]
+        public void Instantiate_Error_When_Name_IsLess_Than_3Characters(string invalidName)
+        {
+            Action action =
+                () => new DomainEntity.Category("Category Ok Description", invalidName);
+
+            var exception = Assert.Throws<EntityValidationException>(action);
+            Assert.Equal($"Name should not be at least 3 characters", exception.Message);
+        }
+
         // name must to have maximum 255 characters
+        [Fact(DisplayName = nameof(Instantiate_Error_When_Name_IsGreather_Than_255Characters))]
+        [Trait("Domain", "Category - Agregates")]
+        public void Instantiate_Error_When_Name_IsGreather_Than_255Characters()
+        {
+            var invalidName = String.Join(null, Enumerable.Range(0, 256).Select(_ => "a").ToArray());
+
+            Action action =
+                () => new DomainEntity.Category("Category Ok Description", invalidName);
+
+            var exception = Assert.Throws<EntityValidationException>(action);
+            Assert.Equal($"Name should not be less or equal 255 characters", exception.Message);
+        }
+
         // description must to have maximum 10.000 characters
+        [Fact(DisplayName = nameof(Instantiate_Error_When_Description_IsGreather_Than_10000Characters))]
+        [Trait("Domain", "Category - Agregates")]
+        public void Instantiate_Error_When_Description_IsGreather_Than_10000Characters()
+        {
+            var invalidDescription = String.Join(null, Enumerable.Range(0, 10001).Select(_ => "a").ToArray());
+
+            Action action =
+                () => new DomainEntity.Category(invalidDescription, "Name ok");
+
+            var exception = Assert.Throws<EntityValidationException>(action);
+            Assert.Equal($"Description should not be less or equal 10000 characters", exception.Message);
+        }
     }
 }
